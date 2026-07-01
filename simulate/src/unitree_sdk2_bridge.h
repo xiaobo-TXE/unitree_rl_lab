@@ -13,6 +13,7 @@
 
 #include "param.h"
 #include "physics_joystick.h"
+#include "privileged_publisher.h"
 
 #define MOTOR_SENSOR_NUM 3
 
@@ -273,6 +274,8 @@ public:
         bmsstate->msg_.soc() = 100;
 
         secondary_imustate = std::make_unique<IMUState_t>("rt/secondary_imu");
+
+        privileged_publisher_.init(model);
     }
 
     void run() override
@@ -314,10 +317,14 @@ public:
 
         // In practice, bmsstate is sent at a low frequency; here it is sent with the main loop
         bmsstate->unlockAndPublish();
+
+        // 发布特权信息 (DDS → rt/privileged_state)
+        privileged_publisher_.publish(mj_model_, mj_data_);
     }
 
     using BmsState_t = unitree::robot::RealTimePublisher<unitree_hg::msg::dds_::BmsState_>;
     using IMUState_t = unitree::robot::RealTimePublisher<unitree_hg::msg::dds_::IMUState_>;
     std::unique_ptr<BmsState_t> bmsstate;
     std::unique_ptr<IMUState_t> secondary_imustate;
+    PrivilegedPublisher privileged_publisher_;
 };

@@ -34,6 +34,7 @@
 #include "array_safety.h"
 #include "unitree_sdk2_bridge.h"
 #include "param.h"
+#include "domain_randomizer.h"
 
 #define MUJOCO_PLUGIN_DIR "mujoco_plugin"
 #define NUM_MOTOR_IDL_GO 20
@@ -84,6 +85,7 @@ public:
   std::vector<double> f_ = {0, 0, 0};
 };
 inline ElasticBand elastic_band;
+inline DomainRandomizer domain_randomizer;
 
 
 namespace
@@ -356,6 +358,7 @@ namespace
           m = mnew;
           d = dnew;
           mj_forward(m, d);
+          domain_randomizer.init(m);
 
           // allocate ctrlnoise
           free(ctrlnoise);
@@ -386,6 +389,7 @@ namespace
           m = mnew;
           d = dnew;
           mj_forward(m, d);
+          domain_randomizer.init(m);
 
           // allocate ctrlnoise
           free(ctrlnoise);
@@ -549,6 +553,7 @@ void PhysicsThread(mj::Simulate *sim, const char *filename)
     {
       sim->Load(m, d, filename);
       mj_forward(m, d);
+      domain_randomizer.init(m);
 
       // allocate ctrlnoise
       free(ctrlnoise);
@@ -633,6 +638,7 @@ void user_key_cb(GLFWwindow* window, int key, int scancode, int act, int mods) {
     }
     if(key==GLFW_KEY_BACKSPACE) {
       mj_resetData(m, d);
+      domain_randomizer.randomize(m, d);
       mj_forward(m, d);
     }
   }

@@ -1,0 +1,43 @@
+// =============================================================================
+// PrivilegedState.idl — 特权信息 DDS 消息定义
+//
+// 用于生成 DDS 类型支持代码 (Fast-DDS / CycloneDDS)
+//
+// 生成命令 (以 Fast-DDS 为例):
+//   fastddsgen PrivilegedState.idl
+//
+// 生成后将 PrivilegedState.h / PrivilegedStatePubSubTypes.h 放入
+// simulate/src/ 目录, 并将 privileged_publisher.h 中的 PrivilegedStateMsg
+// 替换为生成的 PrivilegedState 类型.
+//
+// 当前代码使用 POD struct 直接作为 DDS 消息体,
+// 如果 RealTimePublisher<PrivilegedStateMsg> 编译报错,
+// 则需要运行 IDL 代码生成.
+// =============================================================================
+
+struct PrivilegedState
+{
+    // 末端执行器世界坐标 (5 bodies × 3)
+    float end_effector_pos_w[15];
+
+    // 根Link世界坐标
+    float root_pos_w[3];
+
+    // 箱子世界坐标
+    float box_pos_w[3];
+
+    // 箱子姿态四元数 (w, x, y, z)
+    float box_quat_w[4];
+
+    // 箱子半边长 [w, d, h]
+    float box_size[3];
+
+    // 目标点世界坐标
+    float goal_pos_w[3];
+
+    // 帧计数器
+    unsigned long sequence;
+
+    // 对齐填充
+    unsigned long padding;
+};
